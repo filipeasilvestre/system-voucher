@@ -1,0 +1,48 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  role      Role       @default(CONSUMER)
+  company   String
+  contact   String
+  residence String
+  Sessions  Sessions[]
+  Vouchers  Voucher[]
+}
+
+model Sessions {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String
+  expiresAt DateTime
+  valid     Boolean
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+model Voucher {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  qrCode    String
+  ownerId   String
+  createdAt DateTime @default(now())
+  owner     User     @relation(fields: [ownerId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+  CONSUMER
+}
