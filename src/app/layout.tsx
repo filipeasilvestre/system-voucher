@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Devenz Studio | Tickets",
-  description: "Projeto ticket devenz studio",
+  title: "Voucher Portal",
+  description: "Projetsvgriacao de vouchers",
 };
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <link rel="icon" href="/favicon.png" />
+        <link rel="icon" href="/favicon.svg" />
       </head>
       <body className={inter.className}>{children}</body>
     </html>
