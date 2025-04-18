@@ -1,20 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // Importação do usePathname
+import { usePathname, useRouter } from "next/navigation";
 import { Ticket, Menu, X, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const pathname = usePathname(); // Obtém o caminho atual da URL
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para verificar se o usuário está logado
+  const [isAuthChecked, setIsAuthChecked] = useState(false); // Estado para verificar se a autenticação foi checada
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Lista de páginas protegidas
+  const protectedPages = ["/create-voucher", "/dashboard", "/support", "/account"];
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const isActive = (path: string) => pathname === path; // Verifica se o caminho é o atual
+  const isActive = (path: string) => pathname === path;
+
+  // Função para lidar com o logout
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/logout", { method: "POST" });
+      if (response.ok) {
+        setIsLoggedIn(false); // Atualiza o estado para deslogado
+        router.push("/login"); // Redireciona para login após logout
+      } else {
+        console.error("Erro ao fazer logout");
+      }
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    }
+  };
+
+  // Verifica se o usuário está autenticado ao carregar o componente
+useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/login", { method: "GET" });
+      if (response.ok) {
+        setIsLoggedIn(true); // Usuário autenticado
+      } else if (response.status === 401) {
+        // Trata o caso de usuário não autenticado sem exibir erro no console
+        setIsLoggedIn(false);
+      } else {
+        console.error("Erro inesperado ao verificar autenticação:", response.status);
+      }
+    } catch (error) {
+      console.error("Erro ao verificar autenticação:", error);
+      setIsLoggedIn(false);
+    } finally {
+      setIsAuthChecked(true); // Finaliza a verificação de autenticação
+    }
+  };
+
+  checkAuth();
+}, []);
+
+  // Redireciona para login se o usuário tentar acessar uma página protegida sem estar autenticado
+  useEffect(() => {
+    if (isAuthChecked && !isLoggedIn && protectedPages.includes(pathname)) {
+      router.push("/login");
+    }
+  }, [isAuthChecked, isLoggedIn, pathname, router]);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -69,16 +121,51 @@ export default function Header() {
             <Button variant="ghost" size="icon" className="text-gray-600 hover:text-blue-600">
               <Search className="h-5 w-5" />
             </Button>
-            <Link href="/login">
-              <Button variant="outline" className="border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600">
-                Log in
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Sign up
-              </Button>
-            </Link>
+            {isAuthChecked ? (
+              isLoggedIn ? (
+                <>
+                  <Link href="/account">
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                      Conta
+                    </Button>
+                  </Link>
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="border-gray-300 text-gray-700 hover:border-red-600 hover:text-red-600"
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="outline" className="border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600">
+                      Log in
+                    </Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                      Sign up
+                    </Button>
+                  </Link>
+                </>
+              )
+            ) : (
+              <>
+                {/* Exibe botões de login e signup enquanto verifica autenticação */}
+                <Link href="/login">
+                  <Button variant="outline" className="border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600">
+                    Log in
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    Sign up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -134,18 +221,41 @@ export default function Header() {
                 Support
               </Link>
               <div className="pt-2 border-t border-gray-200">
-                <Link
-                  href="/login"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-md"
-                  onClick={toggleMenu}
-                >
-                  Log in
-                </Link>
-                <Link href="/signup" onClick={toggleMenu}>
-                  <Button className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white">
-                    Sign up
-                  </Button>
-                </Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link
+                      href="/account"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-md"
+                      onClick={toggleMenu}
+                    >
+                      Account
+                    </Link>
+                    <Button
+                      onClick={() => {
+                        handleLogout();
+                        toggleMenu();
+                      }}
+                      className="w-full mt-2 border-gray-300 text-gray-700 hover:border-red-600 hover:text-red-600"
+                    >
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-md"
+                      onClick={toggleMenu}
+                    >
+                      Log in
+                    </Link>
+                    <Link href="/signup" onClick={toggleMenu}>
+                      <Button className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white">
+                        Sign up
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>

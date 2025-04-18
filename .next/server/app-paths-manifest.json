@@ -1,0 +1,8 @@
+{
+  "/dashboard/page": "app/dashboard/page.js",
+  "/create-voucher/page": "app/create-voucher/page.js",
+  "/api/login/route": "app/api/login/route.js",
+  "/api/vouchers/route": "app/api/vouchers/route.js",
+  "/page": "app/page.js",
+  "/login/page": "app/login/page.js"
+}

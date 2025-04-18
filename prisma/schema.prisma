@@ -4,21 +4,26 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
-  id        String     @id @default(cuid())
-  name      String
-  email     String     @unique
-  password  String
-  role      Role       @default(CONSUMER)
-  company   String
-  contact   String
-  residence String
-  Sessions  Sessions[]
-  Vouchers  Voucher[]
+  id          String     @id @default(cuid())
+  name        String
+  email       String     @unique
+  password    String
+  role        Role       @default(CONSUMER)
+  company     String
+  contact     String
+  address     String
+  postalCode  String
+  state       String
+  fatNumber   String
+  companyLogo String
+  Sessions    Sessions[]
+  Vouchers    Voucher[]
 }
 
 model Sessions {
@@ -32,13 +37,20 @@ model Sessions {
 }
 
 model Voucher {
-  id        String   @id @default(uuid())
-  name      String
-  code      String   @unique
-  qrCode    String
-  ownerId   String
-  createdAt DateTime @default(now())
-  owner     User     @relation(fields: [ownerId], references: [id])
+  id               String    @id @default(uuid())
+  name             String
+  code             String    @unique
+  qrCode           String?
+  description      String?
+  expiryDate       DateTime?
+  redemptions      Int       @default(0)
+  status           String
+  amount           Float?
+  currency         String?
+  ownerId          String
+  createdAt        DateTime  @default(now())
+  owner            User      @relation(fields: [ownerId], references: [id])
+  logoUrl          String?
 }
 
 enum Role {

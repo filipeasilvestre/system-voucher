@@ -19,7 +19,6 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useRef, useState } from "react";
 
 export function RegisterForm() {
-  // Router for page redirection
   const router = useRouter();
 
   // References for the inputs
@@ -29,28 +28,27 @@ export function RegisterForm() {
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const password2InputRef = useRef<HTMLInputElement>(null);
   const contactInputRef = useRef<HTMLInputElement>(null);
-  const residenceInputRef = useRef<HTMLInputElement>(null);
+  const addressInputRef = useRef<HTMLInputElement>(null);
+  const postalCodeInputRef = useRef<HTMLInputElement>(null);
+  const stateInputRef = useRef<HTMLInputElement>(null);
+  const fatNumberInputRef = useRef<HTMLInputElement>(null);
+  const companyLogoInputRef = useRef<HTMLInputElement>(null);
 
   // Form states
   const [formError, setFormError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
 
-  // Function that performs registration when the form is submitted
   const handleRegisterSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
-      // Prevents the form from being submitted by the browser
       event.preventDefault();
-      // Resets form states
       setFormError("");
       setFormLoading(true);
 
-      // Regex to verify email
       const emailReg = new RegExp(
         "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
       );
 
-      // Checks if inputs exist on the page
       if (
         emailInputRef.current &&
         nameInputRef.current &&
@@ -58,22 +56,26 @@ export function RegisterForm() {
         password2InputRef.current &&
         passwordInputRef.current &&
         contactInputRef.current &&
-        residenceInputRef.current
+        addressInputRef.current &&
+        postalCodeInputRef.current &&
+        stateInputRef.current &&
+        fatNumberInputRef.current &&
+        companyLogoInputRef.current
       ) {
-        // Gets the values filled in the inputs
         const email = emailInputRef.current.value;
         const name = nameInputRef.current.value;
         const company = companyInputRef.current.value;
         const pass1 = passwordInputRef.current.value;
         const pass2 = password2InputRef.current.value;
         const contact = contactInputRef.current.value;
-        const residence = residenceInputRef.current.value;
+        const address = addressInputRef.current.value;
+        const postalCode = postalCodeInputRef.current.value;
+        const state = stateInputRef.current.value;
+        const fatNumber = fatNumberInputRef.current.value;
+        const companyLogo = companyLogoInputRef.current.value;
 
-        // Starts not needing to give any error
         let shouldReturnError = false;
 
-        // If validation error is encountered,
-        // change the error state
         if (!emailReg.test(email)) {
           setFormError("Please enter a valid email address.");
           shouldReturnError = true;
@@ -96,9 +98,6 @@ export function RegisterForm() {
         }
 
         try {
-          // Try to register
-          // If AXIOS returns an error, it will throw new AxiosError()
-          // which will be verified in catch()
           const response = await axios.post<RegisterResponse>("/api/register", {
             email,
             name,
@@ -106,23 +105,22 @@ export function RegisterForm() {
             password: pass1,
             password2: pass2,
             contact,
-            residence,
+            address,
+            postalCode,
+            state,
+            fatNumber,
+            companyLogo,
           });
 
-          // If it got here, registration was successful
           router.push("/");
 
           setFormLoading(false);
           setFormSuccess(true);
         } catch (error) {
-          // If it got here, an error occurred when trying to register the user
-          // We check if it is an instance of AxiosError just to type the error
           if (error instanceof AxiosError) {
-            // The error comes inside response.data, as JSON, according to typing
             const { error: errorMessage } = error.response
               ?.data as RegisterResponse;
 
-            // If the user already exists, suggest going to login
             if (errorMessage === "user already exists") {
               setFormError(
                 "This email is already registered. Try going to login."
@@ -148,15 +146,6 @@ export function RegisterForm() {
           </div>
           <h1 className="text-white font-bold text-4xl font-sans">Voucher Portal</h1>
           <p className="text-white mt-1">Manage and redeem your vouchers with ease</p>
-          <div className="mt-8 bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-            <h3 className="text-white font-semibold text-lg mb-2">Why Register?</h3>
-            <ul className="text-white text-left">
-              <li className="mb-2">• Track your voucher balances</li>
-              <li className="mb-2">• Redeem vouchers instantly</li>
-              <li className="mb-2">• Create custom voucher campaigns</li>
-              <li className="mb-2">• Get detailed analytics</li>
-            </ul>
-          </div>
         </div>
       </div>
       <div className="flex w-1/2 justify-center items-center bg-gray-50">
@@ -173,6 +162,7 @@ export function RegisterForm() {
           <CardContent>
             <form onSubmit={(event) => handleRegisterSubmit(event)}>
               <div className="grid gap-4">
+                {/* Existing Fields */}
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -188,7 +178,7 @@ export function RegisterForm() {
                   <Input
                     ref={nameInputRef}
                     id="name"
-                    type="name"
+                    type="text"
                     placeholder="Your Name"
                     required
                   />
@@ -214,12 +204,53 @@ export function RegisterForm() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="residence">Residence</Label>
+                  <Label htmlFor="address">address</Label>
                   <Input
-                    ref={residenceInputRef}
-                    id="residence"
+                    ref={addressInputRef}
+                    id="address"
                     type="text"
-                    placeholder="Your residence address"
+                    placeholder="Your address address"
+                    required
+                  />
+                </div>
+                {/* New Fields */}
+                <div className="grid gap-2">
+                  <Label htmlFor="postalCode">Código Postal</Label>
+                  <Input
+                    ref={postalCodeInputRef}
+                    id="postalCode"
+                    type="text"
+                    placeholder="Your postal code"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="state">state</Label>
+                  <Input
+                    ref={stateInputRef}
+                    id="state"
+                    type="text"
+                    placeholder="Your district"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="fatNumber">fatNumber</Label>
+                  <Input
+                    ref={fatNumberInputRef}
+                    id="fatNumber"
+                    type="text"
+                    placeholder="Your fatNumber"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="companyLogo">Logo da Empresa</Label>
+                  <Input
+                    ref={companyLogoInputRef}
+                    id="companyLogo"
+                    type="text"
+                    placeholder="URL of your company logo"
                     required
                   />
                 </div>

@@ -14,8 +14,12 @@ interface RegisterProps {
   password: string;
   password2: string;
   contact: string; // Campo adicionado
-  residence: string; // Campo adicionado
+  address: string; // Campo adicionado
   role?: "CLIENT" | "ADMIN" | "CONSUMER";
+  companyLogo?: string; // Campo adicionado
+  fatNumber: string; // Campo adicionado
+  postalCode: string; // Campo adicionado
+  state: string; // Campo adicionado
 }
 
 export interface RegisterResponse {
@@ -29,10 +33,34 @@ export interface RegisterResponse {
 export async function POST(request: Request) {
   const body = (await request.json()) as RegisterProps;
 
-  const { email, name, company, password, password2, contact, residence, role } = body;
+  const {
+    email,
+    name,
+    company,
+    password,
+    password2,
+    contact,
+    address,
+    postalCode,
+    state,
+    fatNumber,
+    companyLogo,
+    role,
+  } = body;
 
   // Validação de campos obrigatórios
-  if (!email || !name || !company || !password || !password2 || !contact || !residence) {
+  if (
+    !email ||
+    !name ||
+    !company ||
+    !password ||
+    !password2 ||
+    !contact ||
+    !address ||
+    !postalCode ||
+    !state ||
+    !fatNumber
+  ) {
     return NextResponse.json(
       { error: "missing required fields" },
       { status: 400 }
@@ -62,12 +90,16 @@ export async function POST(request: Request) {
     // Criação do usuário no banco de dados
     const user = await prisma.user.create({
       data: {
-        name, // Campo adicionado
+        name,
         email,
         company,
         password: hash,
-        contact, // Campo adicionado
-        residence, // Campo adicionado
+        contact,
+        address,
+        postalCode,
+        state,
+        fatNumber,
+        companyLogo: companyLogo || "", // Valor padrão vazio
         role: role || "CLIENT",
       },
     });
