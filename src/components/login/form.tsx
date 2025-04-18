@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { LoaderCircle, Ticket, Mail, Lock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -70,15 +70,15 @@ export function LoginForm() {
   );
 
   return (
-    <div className="h-screen flex">
-      <div className="flex w-1/2 bg-gradient-to-r from-blue-600 to-indigo-800 justify-around items-center">
-        <div className="text-center">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      <div className="flex flex-col md:w-1/2 bg-gradient-to-r from-blue-600 to-indigo-800 justify-center items-center p-6">
+        <div className="text-center max-w-md">
           <div className="flex justify-center mb-4">
-            <Ticket className="h-16 w-16 text-white" />
+            <Ticket className="h-12 w-12 md:h-16 md:w-16 text-white" />
           </div>
-          <h1 className="text-white font-bold text-4xl font-sans">Voucher Portal</h1>
+          <h1 className="text-white font-bold text-3xl md:text-4xl font-sans">Voucher Portal</h1>
           <p className="text-white mt-1">Access your voucher management dashboard</p>
-          <div className="mt-8 bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+          <div className="mt-6 md:mt-8 bg-white/10 p-4 md:p-6 rounded-lg backdrop-blur-sm">
             <h3 className="text-white font-semibold text-lg mb-2">What You Can Do</h3>
             <ul className="text-white text-left">
               <li className="mb-2">• View active vouchers</li>
@@ -89,13 +89,13 @@ export function LoginForm() {
           </div>
         </div>
       </div>
-      <div className="flex w-1/2 justify-center items-center bg-gray-50">
-        <Card className="w-3/4 shadow-lg border-0">
+      <div className="flex flex-1 md:w-1/2 justify-center items-center bg-gray-50 p-4 md:p-6">
+        <Card className="w-full max-w-md shadow-lg border-0">
           <CardHeader className="space-y-1">
             <div className="flex justify-center text-blue-600 mb-2">
-              <Ticket className="h-10 w-10" />
+              <Ticket className="h-8 w-8 md:h-10 md:w-10" />
             </div>
-            <CardTitle className="text-2xl text-center">Sign In</CardTitle>
+            <CardTitle className="text-xl md:text-2xl text-center">Sign In</CardTitle>
             <CardDescription className="text-center">
               Enter your credentials to access the voucher system
             </CardDescription>
@@ -135,7 +135,7 @@ export function LoginForm() {
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div className="flex items-center space-x-2">
                     <input type="checkbox" id="remember" className="rounded border-gray-300" />
                     <label htmlFor="remember" className="text-sm text-gray-600">Remember me</label>

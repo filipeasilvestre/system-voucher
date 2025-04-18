@@ -138,50 +138,51 @@ export function RegisterForm() {
   );
 
   return (
-    <div className="h-screen flex">
-      <div className="flex w-1/2 bg-gradient-to-r from-blue-600 to-indigo-800 justify-around items-center">
-        <div className="text-center">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      <div className="flex flex-col md:w-1/2 bg-gradient-to-r from-blue-600 to-indigo-800 justify-center items-center p-6">
+        <div className="text-center max-w-md py-8 md:py-0">
           <div className="flex justify-center mb-4">
-            <Ticket className="h-16 w-16 text-white" />
+            <Ticket className="h-12 w-12 md:h-16 md:w-16 text-white" />
           </div>
-          <h1 className="text-white font-bold text-4xl font-sans">Voucher Portal</h1>
+          <h1 className="text-white font-bold text-3xl md:text-4xl font-sans">Voucher Portal</h1>
           <p className="text-white mt-1">Manage and redeem your vouchers with ease</p>
         </div>
       </div>
-      <div className="flex w-1/2 justify-center items-center bg-gray-50">
-        <Card className="w-3/4 shadow-lg border-0">
+      <div className="flex flex-1 md:w-1/2 justify-center items-center bg-gray-50 p-4 md:p-6">
+        <Card className="w-full max-w-md shadow-lg border-0">
           <CardHeader className="space-y-1">
             <div className="flex justify-center text-blue-600 mb-2">
-              <Ticket className="h-10 w-10" />
+              <Ticket className="h-8 w-8 md:h-10 md:w-10" />
             </div>
-            <CardTitle className="text-2xl text-center">Create an Account</CardTitle>
+            <CardTitle className="text-xl md:text-2xl text-center">Create an Account</CardTitle>
             <CardDescription className="text-center">
               Enter your details to register for the voucher management system
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="max-h-screen overflow-y-auto">
             <form onSubmit={(event) => handleRegisterSubmit(event)}>
               <div className="grid gap-4">
-                {/* Existing Fields */}
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    ref={emailInputRef}
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    ref={nameInputRef}
-                    id="name"
-                    type="text"
-                    placeholder="Your Name"
-                    required
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      ref={emailInputRef}
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      ref={nameInputRef}
+                      id="name"
+                      type="text"
+                      placeholder="Your Name"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="company">Organization</Label>
@@ -193,59 +194,62 @@ export function RegisterForm() {
                     required
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="contact">Contact</Label>
-                  <Input
-                    ref={contactInputRef}
-                    id="contact"
-                    type="text"
-                    placeholder="Your contact number"
-                    required
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="contact">Contact</Label>
+                    <Input
+                      ref={contactInputRef}
+                      id="contact"
+                      type="text"
+                      placeholder="Your contact number"
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="fatNumber">Tax Number</Label>
+                    <Input
+                      ref={fatNumberInputRef}
+                      id="fatNumber"
+                      type="text"
+                      placeholder="Your tax number"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="address">address</Label>
+                  <Label htmlFor="address">Address</Label>
                   <Input
                     ref={addressInputRef}
                     id="address"
                     type="text"
-                    placeholder="Your address address"
+                    placeholder="Your street address"
                     required
                   />
                 </div>
-                {/* New Fields */}
-                <div className="grid gap-2">
-                  <Label htmlFor="postalCode">Código Postal</Label>
-                  <Input
-                    ref={postalCodeInputRef}
-                    id="postalCode"
-                    type="text"
-                    placeholder="Your postal code"
-                    required
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="postalCode">Postal Code</Label>
+                    <Input
+                      ref={postalCodeInputRef}
+                      id="postalCode"
+                      type="text"
+                      placeholder="Your postal code"
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="state">State/District</Label>
+                    <Input
+                      ref={stateInputRef}
+                      id="state"
+                      type="text"
+                      placeholder="Your district"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="state">state</Label>
-                  <Input
-                    ref={stateInputRef}
-                    id="state"
-                    type="text"
-                    placeholder="Your district"
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="fatNumber">fatNumber</Label>
-                  <Input
-                    ref={fatNumberInputRef}
-                    id="fatNumber"
-                    type="text"
-                    placeholder="Your fatNumber"
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="companyLogo">Logo da Empresa</Label>
+                  <Label htmlFor="companyLogo">Company Logo URL</Label>
                   <Input
                     ref={companyLogoInputRef}
                     id="companyLogo"
@@ -254,25 +258,27 @@ export function RegisterForm() {
                     required
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    ref={passwordInputRef}
-                    id="password"
-                    type="password"
-                    placeholder="Create a secure password"
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="password2">Confirm Password</Label>
-                  <Input
-                    ref={password2InputRef}
-                    id="password2"
-                    type="password"
-                    placeholder="Confirm your password"
-                    required
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      ref={passwordInputRef}
+                      id="password"
+                      type="password"
+                      placeholder="Create a secure password"
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="password2">Confirm Password</Label>
+                    <Input
+                      ref={password2InputRef}
+                      id="password2"
+                      type="password"
+                      placeholder="Confirm your password"
+                      required
+                    />
+                  </div>
                 </div>
                 {formError && (
                   <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded">
