@@ -1,7 +1,6 @@
 {
   "/scan-voucher/page": "app/scan-voucher/page.js",
-  "/create-voucher/page": "app/create-voucher/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/api/login/route": "app/api/login/route.js",
-  "/api/vouchers/route": "app/api/vouchers/route.js"
+  "/api/vouchers/route": "app/api/vouchers/route.js",
+  "/api/login/route": "app/api/login/route.js"
 }
