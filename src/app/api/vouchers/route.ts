@@ -3,6 +3,9 @@ import { PrismaGetInstance } from "@/lib/prisma-pg";
 import { cookies } from "next/headers";
 import fs from "fs";
 import path from "path";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 // Lida com requisições GET para buscar vouchers
 export async function GET(request: NextRequest) {
@@ -126,6 +129,60 @@ export async function POST(request: NextRequest) {
     console.error("Erro ao criar voucher:", error);
     return NextResponse.json(
       { message: "Erro interno do servidor. Por favor, tente novamente mais tarde." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const { code } = await request.json();
+
+    if (!code) {
+      return NextResponse.json(
+        { message: "O campo 'code' é obrigatório." },
+        { status: 400 }
+      );
+    }
+
+    // Busca o voucher pelo código
+    const voucher = await prisma.voucher.findUnique({
+      where: { code },
+    });
+
+    if (!voucher) {
+      return NextResponse.json(
+        { message: "Voucher não encontrado." },
+        { status: 404 }
+      );
+    }
+
+    // Verifica o status do voucher
+    if (voucher.status === "used") {
+      return NextResponse.json(
+        { message: "Este voucher já foi utilizado." },
+        { status: 400 }
+      );
+    }
+
+    if (voucher.status === "expired") {
+      return NextResponse.json(
+        { message: "Este voucher está expirado." },
+        { status: 400 }
+      );
+    }
+
+    // Atualiza o status do voucher para "used"
+    const updatedVoucher = await prisma.voucher.update({
+      where: { code },
+      data: { status: "used" },
+    });
+
+    return NextResponse.json(updatedVoucher, { status: 200 });
+  } catch (error) {
+    console.error("Erro ao validar o voucher:", error);
+    return NextResponse.json(
+      { message: "Erro interno do servidor." },
       { status: 500 }
     );
   }

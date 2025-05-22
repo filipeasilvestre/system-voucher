@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/dashboard/page": [
+    "/scan-voucher/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/page.js"
+      "static/chunks/app/scan-voucher/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -16,20 +16,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/create-voucher/page.js"
     ],
-    "/login/page": [
+    "/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
-    ],
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
-    "/signup/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/signup/page.js"
+      "static/chunks/app/dashboard/page.js"
     ]
   }
 }

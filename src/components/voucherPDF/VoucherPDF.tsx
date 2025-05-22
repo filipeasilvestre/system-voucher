@@ -21,44 +21,91 @@ export interface Voucher {
   showLogo?: boolean;
   showQRCode?: boolean;
   showExpiryDate?: boolean;
+  horseSilhouetteUrl?: string; // Added for horse silhouette image
 }
 
 /**
- * Generates a minimalist PDF for vouchers
+ * Generates a minimalist PDF for vouchers with gold frames and horse silhouette
  */
 export const generateVoucherPDF = async (voucher: Voucher): Promise<Blob> => {
-  console.log("Generating PDF with voucher data:", voucher); // Log para depuração
-
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "mm",
     format: "a5",
   });
 
-  // Define minimalist colors - monochromatic scheme
-  const primaryColor = voucher.primaryColor || "#333333";
-  const secondaryColor = voucher.secondaryColor || "#666666";
-  const textColor = voucher.textColor || "#333333";
+  // Definir cores
+  const amberColor = "#F9A825"; // Cor âmbar
+  const grayColor = "#4E4E4E"; // Cinza escuro para texto
+  const whiteColor = "#FFFFFF"; // Branco para texto e fundo
 
-  // Convert hex colors to RGB for jsPDF
-  const primaryRGB = hexToRgb(primaryColor);
-  const secondaryRGB = hexToRgb(secondaryColor);
-  const textRGB = hexToRgb(textColor);
+  const amberRGB = hexToRgb(amberColor);
+  const grayRGB = hexToRgb(grayColor);
 
-  // Get page dimensions
+  // Dimensões da página
   const width = doc.internal.pageSize.getWidth();
   const height = doc.internal.pageSize.getHeight();
 
-  // Add clean white background
+  // Fundo branco
   doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, width, height, "F");
 
-  // Add minimal border
-  doc.setDrawColor(primaryRGB.r, primaryRGB.g, primaryRGB.b, 0.3);
-  doc.setLineWidth(0.5);
-  doc.rect(10, 10, width - 20, height - 20, "S");
+  // Header com logo e título
+  doc.setFillColor(amberRGB.r, amberRGB.g, amberRGB.b);
+  doc.rect(0, 0, width, 20, "F");
 
-  // Add company logo (if available)
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(255, 255, 255);
+  doc.text("ECO SALGADOS", 10, 12);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text("AGROTURISMO & ACTIVIDADES EQUESTRES", 10, 17);
+
+  // Número do voucher
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text(`Voucher nº ${voucher.code || "20250214"}`, width - 50, 12);
+
+  // Título principal
+  doc.setFont("times", "italic");
+  doc.setFontSize(28);
+  doc.setTextColor(grayRGB.r, grayRGB.g, grayRGB.b);
+  doc.text("PASSEIO NA PRAIA", width / 2, 40, { align: "center" });
+
+  // Descrição
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(12);
+  doc.setTextColor(grayRGB.r, grayRGB.g, grayRGB.b);
+  doc.text("Uma experiência inesquecível junto ao mar", width / 2, 50, { align: "center" });
+
+  // Estrelas de avaliação
+  const starSize = 8;
+  const starSpacing = 12;
+  const starY = 60;
+  for (let i = 0; i < 5; i++) {
+    const starX = width / 2 - (starSpacing * 2) + i * starSpacing;
+    drawStar(doc, starX, starY, starSize, amberColor);
+  }
+
+  // QR Code
+  if (voucher.qrCode) {
+    const qrSize = 30;
+    const qrX = 10;
+    const qrY = height - qrSize - 10;
+    doc.addImage(voucher.qrCode, "PNG", qrX, qrY, qrSize, qrSize);
+    doc.setFontSize(10);
+    doc.setTextColor(grayRGB.r, grayRGB.g, grayRGB.b);
+    doc.text("Scan para validar", qrX + qrSize / 2, qrY + qrSize + 5, { align: "center" });
+  }
+
+  // Imagem à direita
+  const imageWidth = width / 2.5;
+  const imageHeight = height / 2.5;
+  const imageX = width - imageWidth - 10;
+  const imageY = 30;
+
   if (voucher.logoUrl) {
     try {
       const response = await fetch(voucher.logoUrl);
@@ -71,158 +118,76 @@ export const generateVoucherPDF = async (voucher: Voucher): Promise<Blob> => {
         reader.readAsDataURL(blob);
       });
 
-      const base64Logo = await base64Promise;
-
-      const img = new Image();
-      img.src = base64Logo;
-
-      await new Promise((resolve) => {
-        img.onload = resolve;
-      });
-
-      const originalWidth = img.width;
-      const originalHeight = img.height;
-
-      const maxWidth = 40;
-      const maxHeight = 20;
-
-      let logoWidth = maxWidth;
-      let logoHeight = maxHeight;
-
-      if (originalWidth > originalHeight) {
-        logoHeight = (originalHeight / originalWidth) * maxWidth;
-      } else {
-        logoWidth = (originalWidth / originalHeight) * maxHeight;
-      }
-
-      const logoX = width - 60;
-      const logoY = 20;
-
-      doc.addImage(base64Logo, "PNG", logoX, logoY, logoWidth, logoHeight);
+      const base64Image = await base64Promise;
+      doc.addImage(base64Image, "JPEG", imageX, imageY, imageWidth, imageHeight);
     } catch (error) {
-      console.error("Error loading logo:", error);
-
-      const placeholderWidth = 40;
-      const placeholderHeight = 20;
-      const placeholderX = width - 60;
-      const placeholderY = 20;
-
-      doc.setFillColor(240, 240, 240);
-      doc.rect(placeholderX, placeholderY, placeholderWidth, placeholderHeight, "F");
+      console.error("Erro ao carregar a imagem:", error);
     }
   }
 
-// Ajustar a posição e largura do nome do voucher
-doc.setFontSize(24);
-doc.setTextColor(0, 0, 0); // Cor preta para o texto
-doc.setFont("helvetica", "bold");
+  // Rodapé com validade
+  doc.setFillColor(amberRGB.r, amberRGB.g, amberRGB.b);
+  doc.rect(0, height - 10, width, 10, "F");
 
-// Definir limites para o texto
-const nameX = 20; // Posição X inicial
-const nameY = 40; // Posição Y inicial
-const maxWidth = width - 80; // Limite de largura (para evitar sobreposição com a logo)
-
-// Renderizar o nome do voucher com limite de largura
-doc.text(voucher.name || "Gift Voucher", nameX, nameY, { maxWidth });
-
-  // Adjusted position for the voucher description
-  if (voucher.description) {
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(secondaryRGB.r, secondaryRGB.g, secondaryRGB.b);
-    doc.text(voucher.description, 20, 50, { maxWidth: width - 80 });
-  }
-
-  const dividerY = voucher.description ? 65 : 55;
-  doc.setDrawColor(primaryRGB.r, primaryRGB.g, primaryRGB.b, 0.2);
-  doc.setLineWidth(0.3);
-  doc.line(20, dividerY, width - 20, dividerY);
-
-  const amountY = dividerY + 15;
-
-
-  const codeY = amountY + 15;
-
-  doc.setFontSize(8);
-  doc.setTextColor(secondaryRGB.r, secondaryRGB.g, secondaryRGB.b);
-  doc.setFont("helvetica", "normal");
-  doc.text("VOUCHER CODE", 20, codeY);
-
-  doc.setFontSize(16);
-  doc.setTextColor(textRGB.r, textRGB.g, textRGB.b);
-  doc.setFont("courier", "normal");
-  doc.text(voucher.code, 20, codeY + 8);
-
-  let qrCodeData = voucher.qrCode;
-  if (!qrCodeData) {
-    try {
-      qrCodeData = await QRCode.toDataURL(voucher.code, {
-        errorCorrectionLevel: "M",
-        margin: 1,
-        color: {
-          dark: textColor,
-          light: "#FFFFFF",
-        },
-      });
-    } catch (error) {
-      console.error("Error generating QR Code:", error);
-    }
-  }
-
-  if (qrCodeData) {
-    const qrSize = 30;
-    const qrX = width - 50;
-    const qrY = height - 50;
-
-    doc.addImage(qrCodeData, "PNG", qrX, qrY, qrSize, qrSize);
-  }
-
-  if (voucher.expiryDate) {
-    const expiryDate = new Date(voucher.expiryDate);
-    const formattedDate = expiryDate.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(secondaryRGB.r, secondaryRGB.g, secondaryRGB.b);
-    doc.text(`Valid until: ${formattedDate}`, 20, height - 20);
-  }
-
-  if (voucher.status) {
-    const statusY = 20;
-    const statusColor = getMinimalistStatusColor(voucher.status);
-    const statusRGB = hexToRgb(statusColor);
-
-    doc.setFontSize(10);
-    doc.setTextColor(statusRGB.r, statusRGB.g, statusRGB.b);
-    doc.setFont("helvetica", "normal");
-    doc.text(voucher.status.toUpperCase(), width - 20, statusY, {
-      align: "right",
-    });
-  }
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(255, 255, 255);
+  doc.text("Válido por 1 ano a partir da data de emissão", width / 2, height - 5, { align: "center" });
 
   return doc.output("blob");
 };
 
 /**
- * Returns a muted color based on voucher status for minimalist design
+ * Helper function to draw a star
  */
-function getMinimalistStatusColor(status: string): string {
-  switch (status.toLowerCase()) {
-    case "active":
-      return "#4B9D74";
-    case "used":
-      return "#9CA3AF";
-    case "expired":
-      return "#DC6F79";
-    case "pending":
-      return "#D7A45E";
-    default:
-      return "#6B7280";
-  }
+function drawStar(doc: jsPDF, x: number, y: number, size: number, color: string) {
+  const rgb = hexToRgb(color);
+  doc.setFillColor(rgb.r, rgb.g, rgb.b);
+
+  const points = [
+    [0, -size],
+    [size * 0.4, -size * 0.4],
+    [size, 0],
+    [size * 0.4, size * 0.4],
+    [0, size],
+    [-size * 0.4, size * 0.4],
+    [-size, 0],
+    [-size * 0.4, -size * 0.4],
+  ];
+
+  doc.lines(
+    points.map(([px, py], i) => {
+      const [nx, ny] = points[(i + 1) % points.length];
+      return [nx - px, ny - py];
+    }),
+    x, y, [1, 1], "F"
+  );
+}
+
+/**
+ * Helper function to draw a diamond
+ */
+function drawDiamond(doc: jsPDF, x: number, y: number, size: number, color: string) {
+  const rgb = hexToRgb(color);
+  doc.setFillColor(rgb.r, rgb.g, rgb.b);
+  
+  // Create diamond path
+  const points = [
+    [0, -size],  // Top point
+    [size, 0],   // Right point
+    [0, size],   // Bottom point
+    [-size, 0]   // Left point
+  ];
+  
+  doc.lines(
+    [
+      [points[1][0] - points[0][0], points[1][1] - points[0][1]],
+      [points[2][0] - points[1][0], points[2][1] - points[1][1]],
+      [points[3][0] - points[2][0], points[3][1] - points[2][1]],
+      [points[0][0] - points[3][0], points[0][1] - points[3][1]]
+    ],
+    x + points[0][0], y + points[0][1], [1, 1], 'F'
+  );
 }
 
 /**
